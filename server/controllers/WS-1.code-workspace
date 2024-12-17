@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../../Web-socket/WS-1"
+		},
+		{
+			"path": "../../../Web-socket/WS-1(react)"
+		},
+		{
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "WS-1"
+	}
+}
