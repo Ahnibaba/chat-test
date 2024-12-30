@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
     socket.on("sendMessage", (message) => {
       const user = onlineUsers.find(user => user.userId === message.recipientId)
 
-      console.log("send message user", user);
+      console.log(onlineUsers);
       
       if(user) {
         io.to(user.socketId).emit("getMessage", message)
@@ -34,6 +34,20 @@ io.on("connection", (socket) => {
         })
       }
     })
+
+    //Listen for activity
+    socket.on("activity", ({ recipientId, activityName }) => {
+        const user = onlineUsers.find(user => user.userId === recipientId)  
+    
+        if(user) {
+            socket.broadcast.to(user.socketId).emit("activity", activityName)
+          }
+    })
+ 
+
+
+
+
 
     
 

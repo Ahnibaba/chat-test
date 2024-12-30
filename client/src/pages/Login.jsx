@@ -11,7 +11,7 @@ const Login = () => {
     isLoginLoading
   } = useContext(AuthContext)
 
-  console.log(loginInfo);
+
 
   
   return (

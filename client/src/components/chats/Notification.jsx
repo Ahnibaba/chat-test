@@ -10,15 +10,15 @@ const Notification = () => {
     const { user } = useContext(AuthContext)
     const { notifications, userChats, allUsers, markAllNotificationsAsRead, markNotificationAsRead } = useContext(ChatContext)
 
+    console.log("Noti", notifications);
+    
+    
     const unreadNotifications = unreadNotificationsFunc(notifications)
     const modifiedNotifications = notifications.map((n) => {
         const sender = allUsers.find(user => user._id === n.senderId)
 
         return { ...n, senderName: sender?.name }
     })
-
-    console.log("un", unreadNotifications);
-    console.log("mn", modifiedNotifications);
 
 
 

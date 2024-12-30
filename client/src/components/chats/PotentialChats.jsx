@@ -7,9 +7,7 @@ const PotentialChats = () => {
     const { user } = useContext(AuthContext)
     const { potentialChats, createChat, onlineUsers } = useContext(ChatContext)
 
-    //console.log(potentialChats);
-    //console.log(onlineUsers);
-    
+
     
     
   return (

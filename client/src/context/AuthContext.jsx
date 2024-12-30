@@ -22,11 +22,7 @@ export const AuthContextProvider = ({ children }) => {
         email: "",
         password: ""
     })
-    console.log(loginInfo);
-    
-
-    console.log(user);
-    
+   
 
     useEffect(() => {
       const user = localStorage.getItem("User")

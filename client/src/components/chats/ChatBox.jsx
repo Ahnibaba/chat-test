@@ -8,16 +8,12 @@ import InputEmoji from "react-input-emoji"
 
 const ChatBox = () => {
     const { user } = useContext(AuthContext)
-    const { currentChat, messages, isMessagesLoading, sendTextMessage, textMessage, setTextMessage} = useContext(ChatContext)
+    const { currentChat, messages, isMessagesLoading, sendTextMessage, textMessage, setTextMessage, handleChange, typing, createNotification } = useContext(ChatContext)
 
     const { recipientUser } = useFetchRecipient(currentChat, user)
 
-
-    //console.log("text", textMessage);
-
-
-    console.log(currentChat);
-    //console.log("recipientUser", recipientUser);
+    
+   
    
     
 
@@ -28,7 +24,11 @@ const ChatBox = () => {
     }, [messages])
 
 
+   
+
+
     if (!recipientUser) {
+        
         return (
             <p style={{ textAlign: "center", width: "100%", color: "white" }}>
                 No conversation selected yet...
@@ -43,11 +43,13 @@ const ChatBox = () => {
         )
     }
 
+    
+   
 
     return (
         <Stack gap={4} className="chat-box">
-            <div className="chat-header">
-                <strong>{recipientUser?.user?.name}</strong>
+            <div className="chat-header" style={{ color: "white"}}>
+                <strong>{recipientUser?.name}</strong>
             </div>
             <Stack gap={3} className="messages">
                 {messages && messages.map((message, index) => (
@@ -62,16 +64,20 @@ const ChatBox = () => {
                     </Stack>
                 ))}
             </Stack>
+            <p style={{color: "white"}}>{typing}</p>
             <Stack direction="horizontal" gap={3} className="chat-input flex-grow-0">
               
                 <InputEmoji
                     value={textMessage}
-                    onChange={setTextMessage}
+                    onChange={handleChange}
                     fontFamily="nunito"
                     borderColor="rgba(72, 112, 223, 0.2)"
 
                 />
-                <button className="send-btn" onClick={() => sendTextMessage(textMessage, user?.userData, currentChat._id, setTextMessage)}>
+                <button className="send-btn" type="submit" onClick={() => {
+                    sendTextMessage(textMessage, user?.userData, currentChat._id, setTextMessage)
+                    createNotification(user?.userData)
+                }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-send-fill" viewBox="0 0 16 16">
                         <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
                     </svg>

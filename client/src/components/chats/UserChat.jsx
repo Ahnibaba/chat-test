@@ -7,19 +7,31 @@ import { ChatContext } from "../../context/chatContext"
 import { unreadNotificationsFunc } from "../../utils/unreadNotifications"
 import { useFetchLatestMessage } from "../../hooks/useFetchLatestMessage"
 import moment from "moment"
+import { baseUrl } from "../../utils/services"
+import { postRequest } from "../../utils/services"
 
 const UserChat = ({ chat, user }) => {
   const { recipientUser } = useFetchRecipient(chat, user)
   const { onlineUsers, notifications, markThisUserNotificationsAsRead } = useContext(ChatContext)
   const { latestMessage } = useFetchLatestMessage(chat)
 
-  console.log("recipient user", recipientUser);
-  console.log("online user", onlineUsers);
+
+  
 
 
+ 
+  
+  
+
+
+  
   const unreadNotifications = unreadNotificationsFunc(notifications)
   const thisUserNotifications = unreadNotifications?.filter(n => n.senderId === recipientUser?._id)
   const isOnline = onlineUsers?.some((user) => user?.userId === recipientUser?._id)
+
+
+
+
 
 
   const truncateText = (text) => {
@@ -31,8 +43,6 @@ const UserChat = ({ chat, user }) => {
 
     return shortText
   }
-
-  console.log(isOnline);
 
 
 
@@ -48,6 +58,8 @@ const UserChat = ({ chat, user }) => {
           markThisUserNotificationsAsRead(thisUserNotifications, notifications)
 
         }
+        postRequest(`${baseUrl}/notifications/read`, { senderId: latestMessage?.senderId })
+        
       }}
     >
       <div className="d-flex">

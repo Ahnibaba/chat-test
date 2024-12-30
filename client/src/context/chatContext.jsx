@@ -3,6 +3,7 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import { baseUrl, getRequest, postRequest } from "../utils/services.js"
 import io from "socket.io-client"
 
+
 export const ChatContext = createContext()
 
 
@@ -15,27 +16,25 @@ export const ChatContextProvider = ({ children, user }) => {
   const [messages, setMessages] = useState(null)
   const [isMessagesLoading, setIsMessagesLoading] = useState(false)
   const [messagesError, setMessagesError] = useState(null)
-  const [sendTextMessageError, setTextMessageError] = useState(null)
+  //const [sendTextMessageError, setTextMessageError] = useState(null)
   const [newMessage, setNewMessage] = useState(null)
   const [socket, setSocket] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState([])
   const [notifications, setNotifications] = useState([])
   const [allUsers, setAllUsers] = useState([])
   const [textMessage, setTextMessage] = useState("")
+  const [typing, setTyping] = useState("")
+
+
+
+
 
   
 
+  const activityName = user?.userData?.name
+  const recipientId = currentChat?.members.find((id) => id !== user?.userData?._id)
+ 
   
-
-  //console.log("CurrentChat", currentChat);
-
-  console.log("Messages", messages);
-
-  console.log("online users", onlineUsers);
-
-  console.log("current chat", currentChat); 
-
-  console.log("notifications", notifications );
 
 
   
@@ -51,9 +50,8 @@ export const ChatContextProvider = ({ children, user }) => {
     }
   }, [user])
 
-
-
   
+
   // add online users
   useEffect(() => {
     if(socket === null) return
@@ -67,35 +65,70 @@ export const ChatContextProvider = ({ children, user }) => {
     }
   }, [socket])
 
+  
+
+ 
+
+
   // send message
   useEffect(() => {
     if(socket === null) return
-
     const recipientId = currentChat?.members.find((id) => id !== user?.userData?._id)
     socket.emit("sendMessage", { ...newMessage, recipientId })
-
+    
     
   }, [newMessage])
+
+
+ 
+  
+ // Typing activity
+  useEffect(() => {
+    if (socket === null) return
+    let activityTimer
+    socket.on("activity", (name) => {
+      setTyping(`${name} is typing...`)
+
+      //clear after 2 seconds
+      clearTimeout(activityTimer)
+      activityTimer = setTimeout(() => {
+        setTyping("")
+      }, 2000);
+
+    })
+  }, [textMessage])
+
+const handleChange = (text) => {
+  setTextMessage(text)
+  socket.emit("activity", { activityName, recipientId })
+  
+}
 
   // receive message and notification
   useEffect(() => {
     if(socket === null) return
 
     socket.on("getMessage", (res) => {
-      console.log(res);
-      
       if(currentChat?._id !== res.chatId) return
-
+      setTyping("")
       setMessages((prev) => [...prev, res])
     })
 
-    socket.on("getNotifications", (res) => {
+    socket.on("getNotifications", async (res) => {
+      console.log(res);
+      
       const isChatOpen = currentChat?.members.some(id => id === res.senderId)
 
       if(isChatOpen) {
         setNotifications(prev => [{ ...res, isRead: true }, ...prev])
-      }else {
+       
+        await postRequest(`${baseUrl}/notifications/read`, { senderId: res.senderId, isRead: true })
+      }
+      else {
         setNotifications(prev => [res, ...prev])
+
+        
+     
       }
     })
 
@@ -105,6 +138,7 @@ export const ChatContextProvider = ({ children, user }) => {
     }
     
   }, [socket, currentChat])
+
 
 
 
@@ -164,6 +198,8 @@ export const ChatContextProvider = ({ children, user }) => {
     }
     getUserChats()
   }, [user, notifications])
+
+  //get messages
   useEffect(() => {
     const getMessages = async () => {
 
@@ -186,6 +222,26 @@ export const ChatContextProvider = ({ children, user }) => {
     getMessages()
   }, [currentChat])
 
+  //getNotifications
+  useEffect(() => {
+    const getNotifications = async() => {
+      const response = await postRequest(`${baseUrl}/notifications`, { user: user?.userData?._id })
+
+      if (response.error) {
+        return console.log("Notification Error =>", response.error);
+        
+      }
+
+      
+
+      setNotifications(response?.notifications)
+    }
+
+    getNotifications()
+  }, [socket, newMessage])
+
+
+
 
 
 
@@ -197,6 +253,7 @@ export const ChatContextProvider = ({ children, user }) => {
       text: textMessage
 
     }
+    
     const response = await postRequest(`${baseUrl}/messages`, messageBody)
 
     if (response.error) {
@@ -209,6 +266,18 @@ export const ChatContextProvider = ({ children, user }) => {
 
   
   }, [])
+
+  const createNotification = useCallback(async (sender) => {
+         
+    const response = await postRequest(`${baseUrl}/notifications/new`, { senderId: sender._id, isRead: false })
+
+
+    if (response.error) {
+      console.log("Notification Error => ", response.error);
+      
+    }
+  }, [])
+
 
 
   const updateCurrentChat = useCallback((chat) => {
@@ -225,7 +294,6 @@ export const ChatContextProvider = ({ children, user }) => {
 
     }
 
-    console.log(response);
 
 
     setUserChats((prev) => [...prev, response.chat])
@@ -233,7 +301,6 @@ export const ChatContextProvider = ({ children, user }) => {
 
 
   const markAllNotificationsAsRead = useCallback(() => {
-    console.log("notifications", notifications);
     
      const mNotifications = notifications.map(n => (
        {...n, isRead: true}
@@ -250,6 +317,9 @@ export const ChatContextProvider = ({ children, user }) => {
       const isDesiredChat = chat?.members.every((member) => {
         return chatMembers.includes(member)
       })
+
+    
+      
 
       return isDesiredChat
     })
@@ -285,6 +355,7 @@ export const ChatContextProvider = ({ children, user }) => {
     setNotifications(mNotifications)
   }, [])
 
+
   const chatValues = {
     userChats,
     isUserChatsLoading,
@@ -297,6 +368,7 @@ export const ChatContextProvider = ({ children, user }) => {
     messagesError,
     currentChat,
     sendTextMessage,
+    createNotification,
     onlineUsers,
     notifications,
     allUsers,
@@ -305,6 +377,11 @@ export const ChatContextProvider = ({ children, user }) => {
     markThisUserNotificationsAsRead,
     textMessage,
     setTextMessage,
+    handleChange,
+    typing,
+   
+
+
     
  
     

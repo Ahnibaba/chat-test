@@ -15,7 +15,6 @@ const Chat = () => {
     updateCurrentChat
   } = useContext(ChatContext)
 
-  //console.log("UserChat", userChats);
   
   
   

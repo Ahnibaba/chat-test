@@ -30,7 +30,7 @@ const Register = () => {
     }, [registerSuccess, setRegisterInfo])
 
     
-  console.log(registerInfo);
+ 
   
   
     
