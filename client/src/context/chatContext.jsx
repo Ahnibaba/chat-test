@@ -42,7 +42,7 @@ export const ChatContextProvider = ({ children, user }) => {
 
  
   useEffect(() => {
-    const newSocket = io("http://localhost:3000")
+    const newSocket = io("https://chat-test-1-v51y.onrender.com/")
     setSocket(newSocket)
 
     return () => {
