@@ -1,8 +1,8 @@
 require("dotenv").config()
 const mongoose = require("mongoose")
 
-//const MONGO_URL = process.env.MONGO_URL
-const MONGO_URL = "mongodb://localhost:27017/chatDB"
+const MONGO_URL = process.env.MONGO_URL
+//const MONGO_URL = "mongodb://localhost:27017/chatDB"
 
 
 mongoose.connection.once("open", () => {
