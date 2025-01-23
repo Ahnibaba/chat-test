@@ -1,5 +1,6 @@
 import axios from "axios"
-export const baseUrl = "http://localhost:5000/api"
+//export const baseUrl = "http://localhost:5000/api"
+export const baseUrl ="https://chat-test-3k2v.onrender.com"
 
 export const postRequest = async (url, body) => {
 

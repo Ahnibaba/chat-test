@@ -1,5 +1,7 @@
 const { Server } = require("socket.io")
 
+const PORT = process.env.PORT || 3000;
+
 const io = new Server({
     cors: "http://localhost:5173"
 })
@@ -62,4 +64,6 @@ io.on("connection", (socket) => {
 
 })
 
-io.listen(3000)
+io.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
