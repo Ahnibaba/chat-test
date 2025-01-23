@@ -3,7 +3,7 @@ const { Server } = require("socket.io")
 const PORT = process.env.PORT || 3000;
 
 const io = new Server({
-    cors: "https://chat-test-hazel.vercel.app/"
+    cors: "https://chat-test-hazel.vercel.app"
 })
 
 let onlineUsers = []

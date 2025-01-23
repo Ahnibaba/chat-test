@@ -16,7 +16,7 @@
  app.use(express.json())
  
  app.use(cors({
-    origin: "https://chat-test-hazel.vercel.app/"
+    origin: "https://chat-test-hazel.vercel.app"
 }))
 
  app.use("/api/", registerRouter)
